@@ -9,9 +9,17 @@
         position = "top";
         fixed-center = "true";
 
+        #mode = "hide";
+        #start_hidden = true;
+        #modifier = "Mod4";
+        #modifier-reset = "press";
+        #id = "bar-0";
+        #ipc = true;
+        reload_style_on_change = true;
+
         modules-left = [ "custom/l_end" "cpu" "custom/padd" "memory" "custom/r_end" "custom/l_end" "hyprland/workspaces" "custom/r_end" ];
         modules-center = [ "custom/l_end" "clock" "custom/r_end" ];
-        modules-right = [ "custom/l_end" "network" "custom/r_end" "custom/l_end" "pulseaudio" "pulseaudio#microphone" "custom/padd" "battery" "custom/r_end" ];
+        modules-right = [ "custom/l_end" "network" "custom/r_end" "custom/l_end" "group/utils" "custom/padd" "battery" "custom/r_end" ];
 
         #* LEFT MODULES
         "cpu" = {
@@ -52,7 +60,27 @@
         "clock" = {
           format = "{: %I:%M %p 󰃭 %a %d}";
           format-alt = "{:󰥔 %H:%M  %b %Y}";
-          tooltip-format = "<tt><big>{calendar}</big></tt>";
+          tooltip-format = "<tt><small>{calendar}</small></tt>";
+		  calendar = {
+			    mode = "year";
+			    mode-mon-col = 3;
+			    weeks-pos = "right";
+			    on-scroll = 1;
+			    format = {
+			        months =     "<span color='#cdd6f4'><b>{}</b></span>";
+			        days =      "<span color='#cdd6f4'><b>{}</b></span>";
+			        #weeks =      "<span color='#99ffdd'><b>W{}</b></span>";
+			        weekdays =   "<span color='#a6adc8'><b>{}</b></span>";
+			        today =      "<span color='#fc023c'><b>{}</b></span>";
+			    };
+        	};
+			actions = {
+                on-click-forward = "tz_up";
+                on-click-right = "mode";
+                on-click-backward = "tz_down";
+                on-scroll-up = "shift_up";
+                on-scroll-down = "shift_down";
+            };
         };
 
         #* RIGHT MODULES
@@ -77,9 +105,23 @@
         #    interval = 86400; # once every day
         #    tooltip = true;
         #};
-          #device = "acpi_video1";
+
+		"group/utils" = {
+			orientation = "horizontal";
+      drawer = {
+				transition-duration = 1000;
+				transition-left-to-right = true;
+			};
+			modules = [
+				"pulseaudio"
+				"pulseaudio#microphone"
+				"custom/padd"
+				"backlight"
+        "custom/padd"
+			];
+		};
         "backlight" = {
-            format = "{icon} {percent}%";
+            format = "{icon} {percent}";
             format-icons = [ "" "" "" "" "" "" "" "" "" ];
             on-scroll-up = "brightnessctl set +1%";
             on-scroll-down = "brightnessctl set 1%-";
@@ -89,10 +131,10 @@
             format = "{icon} {volume}";
             format-muted = "󰝟";
             on-click = "pavucontrol -t 3";
-            on-click-middle = "~/.config/hypr/scripts/volumecontrol.sh -o m";
-            on-scroll-up = "~/.config/hypr/scripts/volumecontrol.sh -o i";
-            on-scroll-down = "~/.config/hypr/scripts/volumecontrol.sh -o d";
-            tooltip-format = "{icon} {desc} // {volume}%";
+            on-click-middle = "pactl set-sink-mute 0 toggle";
+            on-scroll-up = "amixer -q set Master 1%+ unmute";
+            on-scroll-down = "amixer -q set Master 1%- unmute";
+            tooltip-format = "{icon} {volume}%";
             scroll-step = 5;
             format-icons = {
                 headphone = "";
@@ -107,13 +149,13 @@
     
         "pulseaudio#microphone" = {
             format = "{format_source}";
-            format-source =  " ";
+            format-source =  "  {volume}";
             format-source-muted = " ";
             on-click = "pavucontrol -t 4";
-            on-click-middle = "~/.config/hypr/scripts/volumecontrol.sh -i m";
-            on-scroll-up = "~/.config/hypr/scripts/volumecontrol.sh -i i";
-            on-scroll-down = "~/.config/hypr/scripts/volumecontrol.sh -i d";
-            tooltip-format = "{format_source} {source_desc} // {source_volume}%";
+            on-click-middle = "amixer -q set Capture mute toggle";
+            on-scroll-up = "amixer -q set Capture 1%+ unmute";
+            on-scroll-down = "amixer -q set Capture 1%- unmute";
+            tooltip-format = "{format_source}%";
             scroll-step = 5;
         };
     
@@ -125,7 +167,7 @@
                 good = 80;
                 critical = 20;
             };
-            format = "{icon} {capacity}%";
+            format = "{icon} {capacity}";
             format-charging = " {capacity}%";
             format-plugged = " {capacity}%";
             format-alt = "{time} {icon}";

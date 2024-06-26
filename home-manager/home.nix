@@ -38,6 +38,9 @@
 		dunst
 		feh
 		flameshot
+		cliphist
+		wl-clipboard
+		wl-clip-persist
 		#polybar
 		#rofi
 		pavucontrol
@@ -46,9 +49,10 @@
 		networkmanagerapplet
 		dmenu
 		networkmanager_dmenu
+		hyprpaper
 		openjdk
 		bluej
-		hyprpaper
+
 	];
 	home.stateVersion = "23.11"; 
 	programs.home-manager.enable = true;
